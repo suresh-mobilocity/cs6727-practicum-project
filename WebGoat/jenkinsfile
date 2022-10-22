@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+    environment{
+        gitCredentialId = '538642ab-cd02-4e8f-8025-ee284820b1cd'
+        
+        APP_ID='WebGoat'
+        SBOM_FILE='WebGoat-build.sbom'
+        ARTIFACTS_DIR='/home/risqexpert/build-artifacts'
+        SBOM_DIR='/home/risqexpert/sbom-files'
+        VUL_FILE='WebGoat-vulnerabilites.json'
+    }
+    stages {
+        stage('CS6727-ProgressReport4') {
+            steps {
+                echo 'CS6727-ProgressReport4'
+                sh 'whoami'
+            }
+        }
+        stage('Clone sources') {
+            steps{
+                git (
+                    url: 'https://github.com/WebGoat/WebGoat.git',
+                    branch: 'develop',
+                    credentialsId: gitCredentialId
+                )
+            }
+        }
+        stage('build application') {
+            steps{
+                sh '$WORKSPACE/mvnw clean install'
+                echo 'java application build complete'
+                sh 'sudo /usr/bin/docker build -f Dockerfile . -t webgoat/webgoat'
+                echo 'docker image build complete'
+            }
+        }
+        stage('Publish Artifacts') {
+            steps {
+                    sh 'mkdir -p /home/risqexpert/build-artifacts/$APP_ID'
+                    sh 'cp ./target/webgoat-8.2.3-SNAPSHOT.jar $ARTIFACTS_DIR/$APP_ID'
+                    echo 'Publish artifacts complete'
+            }
+        }
+        stage('SBOM Creation') {
+            steps {
+                    sh '/usr/local/bin/syft packages dir:. -o spdx-json > $SBOM_DIR/$SBOM_FILE'
+                    echo 'SBOM creation complete'
+            }
+        }
+        stage('Scan SBOM'){
+            steps {
+                    sh '/usr/local/bin/grype sbom:$SBOM_DIR/$SBOM_FILE -o embedded-cyclonedx-vex-json > $SBOM_DIR/$VUL_FILE'
+                    echo 'Vulnerabily Scan Complete'
+            }
+        }
+    }
+}
