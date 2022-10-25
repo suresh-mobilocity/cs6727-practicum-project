@@ -20,7 +20,7 @@ var options = {
   'headers': {
     'Content-Type': 'application/json',
     'Access-Control-Request-Headers': '*',
-    'api-key': '6354352e863169c99771a650'
+    'api-key': ''
   },
   body: JSON.stringify({
     "dataSource": "risqexpert-db",
