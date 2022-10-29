@@ -2,10 +2,6 @@ var request = require('request');
 var args = process.argv.slice(2);
 var sbom_file =  args[0];
 
-if(args.length<1){
-	console.log("Usage:  query_app_profile <app name> ") 
-        process.exit(0);
-}
 fs = require('fs')
 var sbom = {}; 
 fs.readFile(sbom_file, 'utf8', function (err,sbom) {

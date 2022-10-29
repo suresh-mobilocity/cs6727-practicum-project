@@ -8,19 +8,18 @@ var prev_scanned_time = new Date(current_time.getTime() - (24*60*60*1000));
 var dd = String(current_time.getDate()).padStart(2, '0');
 var mm = String(current_time.getMonth() + 1).padStart(2, '0'); //January is 0!
 var yyyy = current_time.getFullYear();
-var HH = current_time.getHours(); 
-var MI = current_time.getMinutes(); 
-var SS = current_time.getSeconds(); 
-var MS = current_time.getMilliseconds(); 
+var HH = String(current_time.getHours()).padStart(2,"0"); 
+var MI = String(current_time.getMinutes()).padStart(2,"0"); 
+var SS = String(current_time.getSeconds()).padStart(2,"0");; 
+var MS = String(current_time.getMilliseconds()).padStart(3,"0"); 
 
 var prev_dd = String(prev_scanned_time.getDate()).padStart(2,0);
 var prev_mm = String(prev_scanned_time.getMonth() + 1).padStart(2, '0'); //January is 0!
 var prev_yyyy = prev_scanned_time.getFullYear();
-var prev_HH = prev_scanned_time.getHours();
-var prev_MI = prev_scanned_time.getMinutes();
-var prev_SS = prev_scanned_time.getSeconds();
-var prev_MS = prev_scanned_time.getMilliseconds();
-
+var prev_HH = String(prev_scanned_time.getHours()).padStart(2,"0");
+var prev_MI = String(prev_scanned_time.getMinutes()).padStart(2,"0");
+var prev_SS = String(prev_scanned_time.getSeconds()).padStart(2,"0");
+var prev_MS = String(prev_scanned_time.getMilliseconds()).padStart(3,"0");
 
 var params = "pubStartDate=" + prev_yyyy + "-" + prev_mm + "-" + prev_dd + "T" + prev_HH + ":" + prev_MI + ":" + prev_SS + "." +  prev_MS + "-05:00";
 

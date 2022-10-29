@@ -8,7 +8,7 @@ var found = "false"
 fs = require('fs');
 var sbom = {}; 
 if(args.length<4){
-	console.log("Usage: search_sbom_for_cve  <sbomfile> <vendor> <product> <version> ") 
+	console.log("Usage: search_pkg_in_sbom  <sbomfile> <vendor> <product> <version> ") 
         process.exit(0);
 }
 
