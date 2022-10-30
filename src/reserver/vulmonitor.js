@@ -12,8 +12,8 @@
 var express = require("express");
 var app = express();
 
-require('../scripts/nvd_vuln_monitor_cronjob.js');
-qv = require('../scripts/query_app_vulns.js');
+require('./cronjob/nvd_vuln_monitor_cronjob.js');
+qv = require('./db/query_app_vulns.js');
 
 app.get("/about", function(req, res,next) {
  res.json("Vulnerability Monitor Server Application");

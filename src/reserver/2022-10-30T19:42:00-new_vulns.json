@@ -1,0 +1,88 @@
+{
+  "resultsPerPage": 3,
+  "startIndex": 0,
+  "totalResults": 3,
+  "format": "NVD_CVE",
+  "version": "2.0",
+  "timestamp": "2022-10-30T19:42:00.633",
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2022-44032",
+        "sourceIdentifier": "cve@mitre.org",
+        "published": "2022-10-30T01:15:08.823",
+        "lastModified": "2022-10-30T01:15:08.823",
+        "vulnStatus": "Received",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "An issue was discovered in the Linux kernel through 6.0.6. drivers/char/pcmcia/cm4000_cs.c has a race condition and resultant use-after-free if a physically proximate attacker removes a PCMCIA device while calling open(), aka a race condition between cmm_open() and cm4000_detach()."
+          }
+        ],
+        "metrics": {},
+        "references": [
+          {
+            "url": "https://lore.kernel.org/lkml/20220915020834.GA110086@ubuntu/",
+            "source": "cve@mitre.org"
+          },
+          {
+            "url": "https://lore.kernel.org/lkml/20220919040701.GA302806@ubuntu/",
+            "source": "cve@mitre.org"
+          }
+        ]
+      }
+    },
+    {
+      "cve": {
+        "id": "CVE-2022-44033",
+        "sourceIdentifier": "cve@mitre.org",
+        "published": "2022-10-30T01:15:08.880",
+        "lastModified": "2022-10-30T01:15:08.880",
+        "vulnStatus": "Received",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "An issue was discovered in the Linux kernel through 6.0.6. drivers/char/pcmcia/cm4040_cs.c has a race condition and resultant use-after-free if a physically proximate attacker removes a PCMCIA device while calling open(), aka a race condition between cm4040_open() and reader_detach()."
+          }
+        ],
+        "metrics": {},
+        "references": [
+          {
+            "url": "https://lore.kernel.org/lkml/20220915020834.GA110086@ubuntu/",
+            "source": "cve@mitre.org"
+          },
+          {
+            "url": "https://lore.kernel.org/lkml/20220919040457.GA302681@ubuntu/",
+            "source": "cve@mitre.org"
+          }
+        ]
+      }
+    },
+    {
+      "cve": {
+        "id": "CVE-2022-44034",
+        "sourceIdentifier": "cve@mitre.org",
+        "published": "2022-10-30T01:15:08.937",
+        "lastModified": "2022-10-30T01:15:08.937",
+        "vulnStatus": "Received",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "An issue was discovered in the Linux kernel through 6.0.6. drivers/char/pcmcia/scr24x_cs.c has a race condition and resultant use-after-free if a physically proximate attacker removes a PCMCIA device while calling open(), aka a race condition between scr24x_open() and scr24x_remove()."
+          }
+        ],
+        "metrics": {},
+        "references": [
+          {
+            "url": "https://lore.kernel.org/lkml/20220916050333.GA188358@ubuntu/",
+            "source": "cve@mitre.org"
+          },
+          {
+            "url": "https://lore.kernel.org/lkml/20220919101825.GA313940@ubuntu/",
+            "source": "cve@mitre.org"
+          }
+        ]
+      }
+    }
+  ]
+}
