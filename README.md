@@ -7,6 +7,7 @@ The prototype implementation uses NVD API to monitor new CVEs.
 
 # dependencies
 Node 10.x
+MongoDB Data API
 
 # Run From the sources:
 
