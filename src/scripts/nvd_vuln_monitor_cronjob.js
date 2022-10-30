@@ -1,6 +1,8 @@
 var CronJob = require('cron').CronJob;
 var request = require('request');
 var fs = require('fs');
+var pcve = require ('../scripts/process_cves.js');
+
 
 console.log("Cron Job to check NVD for new Vulnerabilities every 5 minutes");
 var checkNVDJob = new CronJob({
@@ -8,15 +10,24 @@ var checkNVDJob = new CronJob({
         onTick: function() {
             try{
                 startCheckNVDJob(function(result){
-                    console.log(result.message);
+		    if(result != null ) {
+                    //console.log(result.file);
+                    //console.log(result.message);
+		    	pcve.process_cves(result.file)
+		    }
                 });
             }catch(err)
             {console.log( err.message);}
         },
+	onComplete: function() {
+            try{
+                    console.log("Completed processing CVEs");
+            }catch(err)
+            {console.log( err.message);}
+	},
         start: false
         // timeZone: "America/Los_Angeles"
  });
-console.log("CheckNVDJob instantiated");
 checkNVDJob.start();
 function startCheckNVDJob(callback){
 
@@ -47,7 +58,7 @@ function startCheckNVDJob(callback){
 	params = params+ "&pubEndDate=" + current_time_string;
 	//params = "pubStartDate=2022-10-26T00:00:00.000-05:00&pubEndDate=2022-10-27T23:59:59.999-05:00";
 
-	console.log("API params: " + params);
+	//console.log("API params: " + params);
 	var new_vulns_file = current_time_string.split(".")[0] + "-" + "new_vulns.json"
 	console.log("new vulnerability file:" + new_vulns_file); 
 
@@ -59,6 +70,7 @@ function startCheckNVDJob(callback){
   		}
 	};
 	request(options, function (error, response) {
+		var result = {};
   		if (error){
 			callback({
 				result: "Fail",
@@ -66,13 +78,15 @@ function startCheckNVDJob(callback){
 			});
 		}
 		if(response){
-			console.log("got response");
+			//console.log("got response");
    			//console.log(JSON.stringify(response.body,0,2));
-			console.log(JSON.stringify(response.body,0,2));
+			//console.log(JSON.stringify(response.body,0,2));
    			fs.writeFileSync(new_vulns_file, JSON.stringify(response.body,0,2));
+			result={"file" : new_vulns_file, "message" : "success"};
 		}
 		else{
 			console.log("No new vulnerabilities found ... ");
 		}
+		return callback(result)
 	});
  }

@@ -1,0 +1,15 @@
+{
+  "name": "cs6727",
+  "version": "0.1.0",
+  "private": true,
+  "keywords": [
+    "express"
+  ],
+  "scripts": {
+    "start": "vlunmonitor.js"
+  },
+  "dependencies": {
+    "express": "~4.18.2",
+    "cron": "~2.1.0"
+  }
+}
