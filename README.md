@@ -8,6 +8,9 @@ the solution identifies all the impacted applications and host inventory where t
 The prototype implementation leverages one of the SCA tools such as syft, grype in SDLC CI/CD pipelines to create an inventory of software components (SBOM Software Bill of Materials). 
 The prototype implementation uses NVD API to monitor new CVEs.
 
+
+![alt text](https://github.com/suresh-mobilcoity/cs6727-practicum-project/blob/main/image.jpg?raw=true)
+
 # dependencies
 Node 10.x
 
