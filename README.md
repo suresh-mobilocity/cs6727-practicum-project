@@ -15,6 +15,8 @@ MongoDB Data API
 
 # Run From the sources:
 
+git clone https://github.com/suresh-mobilocity/cs6727-practicum-project.git
+
 cd src/reserver
 
 npm install
