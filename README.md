@@ -9,7 +9,7 @@ The prototype implementation leverages one of the SCA tools such as syft, grype 
 The prototype implementation uses NVD API to monitor new CVEs.
 
 
-![alt text](https://github.com/suresh-mobilcoity/cs6727-practicum-project/blob/main/image.jpg?raw=true)
+![alt text](https://https://github.com/suresh-mobilocity/cs6727-practicum-project/blob/main/vulmonitor.jpg?raw=true)
 
 # dependencies
 Node 10.x
