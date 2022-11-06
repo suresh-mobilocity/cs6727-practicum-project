@@ -39,9 +39,16 @@ function process_cves(cve_list_filename){
 			//	console.log(cve.id + " impacted package - "+ "Vendor: " + cpe[0] + "; Product: " + cpe[1] + ";  Version: " + cpe[2]); 
 			// }
 			// search each cpe in SBOM
-				search_cpes_in_sbom_inventory(cve.id, cpes, function(result){
-					console.log( result.impacted_apps.length + "SBOMS/Apps are impacted by "+  result.cve);
+				search_cpes_in_sbom_inventory(cve, cpes, function(result){
+					console.log( result.impacted_apps.length + "SBOMS/Apps are impacted by "+  result.cve.id);
 					impacted_app_count = impacted_app_count + result.impacted_apps.length;
+					for(var i=0; i < result.impacted_apps.length; i++){
+						var cdx_vuln = convert_cve_to_cdx_vuln_record(cve);
+						//console.log("CDX_VULN: " + JSON.stringify(cdx_vuln,0,2));
+						update_app_vulnerabilities(result.impacted_apps[i],cdx_vuln, function(){
+							console.log("Added new vulnerability to known vulnerabilities ");
+						});
+					}
 				});
 				break;
 			case 'Awaiting Analyis':
@@ -86,7 +93,7 @@ function get_cpes_from_cve(cve)
 
 // Function searchs SBOM inventory and return App_IDs affected by the CVE
 
-function search_cpes_in_sbom_inventory(cve_id, cpes,callback)
+function search_cpes_in_sbom_inventory(cve, cpes,callback)
 {
 	// Search SBOM Inventory DB
 	var impacted_apps=[];
@@ -111,6 +118,7 @@ function search_cpes_in_sbom_inventory(cve_id, cpes,callback)
     			'Access-Control-Request-Headers': '*',
     			'api-key': '6354352e863169c99771a650'
   			},
+		// matching in the affected packages by CVE, but not finding which package(s) is matching. 
   		body: JSON.stringify({
     			"dataSource": "risqexpert-db",
     			"database": "risqexpertdb",
@@ -123,19 +131,167 @@ function search_cpes_in_sbom_inventory(cve_id, cpes,callback)
 	request(options, function (error, response) {
   		if (error) throw new Error(error); 
 		var result=JSON.parse(response.body);
-		console.log(result);
+		//console.log(result);
   		if( result.documents === 'undefined' || result.documents === null || result.documents.length == 0)
   		{
-			console.log("No SBOM is found that is impacted by - " + cve_id);
+			console.log("No SBOM is found that is impacted by - " + cve.id);
   		}
 		else {
                         for ( var i =0, doc_count = result.documents.length; i < doc_count; i++){
-				console.log("Found SBOM " + result.documents[i].name + " impacted by " + cve_id);
+				console.log("Found SBOM " + result.documents[i].name + " impacted by " + cve.id);
 				impacted_apps.push(result.documents[i].name);
 			}
 		}
-		return callback({ "cve": cve_id, "impacted_apps": impacted_apps});
+		// Need to improve this process as we are only checking if theire is any dependeny package 
+		return callback({ "cve": cve, "impacted_apps": impacted_apps});
 	});
+}
+
+function convert_cve_to_cdx_vuln_record(cve, callback)
+{
+//console.log("CVE: " + JSON.stringify(cve,0,2));
+
+var cdx_vuln = {};
+    cdx_vuln["id"] = cve.id;
+    cdx_vuln["source"] = { "name" : "nvd:cpe", 
+	    	"url" : "http://cve.mitre.org/cgi-bin/cvename.cgi?name="+cve.id };
+
+     cdx_vuln["description"]= cve.descriptions[0].value;
+
+var analysis = {"state": cve.vulnStatus };
+     cdx_vuln["analysis"] = analysis;
+
+ var ratings = [];
+    if( "metrics" in cve && (cve.metrics && Object.keys(cve.metrics).length > 0 )){
+    	if( "cvssMetricV2" in cve.metrics){  
+      		var severity = {"severity": cve.metrics.cvssMetricV2[0].cvssData.baseSeverity }; 
+      		console.log("basescore:" + cve.metrics.cvssMetricV2[0].cvssData.baseScore);
+     		var score = { "score" : cve.metrics.cvssMetricV2[0].cvssData.baseScore , "method":"CVSSv2",  "vector": cve.metrics.cvssMetricV2[0].vectorString };
+     		ratings.push(severity) ;
+     		ratings.push(score) ;
+     	}
+    	else
+     	{
+      		var severity = {"severity": cve.metrics.cvssMetricV31[0].cvssData.baseSeverity }; 
+      		console.log("basescore:" + cve.metrics.cvssMetricV31[0].cvssData.baseScore);
+     		var score = { "score" : cve.metrics.cvssMetricV31[0].cvssData.baseScore , "method":"CVSSv31",  "vector": cve.metrics.cvssMetricV31[0].vectorString };
+     		ratings.push(severity) ;
+     		ratings.push(score) ;
+     	}
+    }
+     cdx_vuln["ratings"] = ratings;
+
+
+
+ var advisories =[];
+    for ( var i=0; i< cve.references.length; i++){
+     	a_url = {"url" : cve.references[i].url};
+	advisories.push(a_url);
+    }
+    cdx_vuln["advisories"] = advisories; 
+
+    if( "configurations" in cve && (cve.configurations && Object.keys(cve.configurations).length > 0 )){
+	var affected = [];
+	var cpelist = get_cpes_from_cve(cve);
+    	for ( var j=0; j< cve.references.length; j++){
+		var pkg_ref = { "ref" : cpelist[j][1]};  
+		affected.push(pkg_ref);
+	}
+    	cdx_vuln["affects"]=affected;
+    }
+var properties = [];
+    cdx_vuln["properties"]=properties;
+
+    console.log("Converted CVE " + cve.id + " CyclonDx reporting format");
+
+    return cdx_vuln;
+}
+function update_app_vulnerabilities(appid,new_vuln, callback)
+{
+	//console.log("Adding new vuln : " + JSON.stringify(new_vuln,0,2));
+
+	var request = require('request');
+	var options = {
+  			'method': 'POST',
+  			'url': 'https://data.mongodb-api.com/app/data-ilixv/endpoint/data/v1/action/findOne',
+  			'headers': {
+    				'Content-Type': 'application/json',
+    				'Access-Control-Request-Headers': '*',
+    				'api-key': '6354352e863169c99771a650'
+  			},
+  			body: JSON.stringify({
+    				"dataSource": "risqexpert-db",
+    				"database": "risqexpertdb",
+    				"collection": "app_vulnerabilities",
+    				"filter": {
+	 				"metadata.component.name": appid
+    				}
+  			})
+	};
+	request(options, function (error, response) {
+  	if (error) throw new Error(error);
+		var app_vul_doc=JSON.parse(response.body);
+		//console.log(app_vul_doc);
+  		if( app_vul_doc.document === 'undefined' || app_vul_doc.document === null || app_vul_doc.document.length == 0)
+  		{
+			console.log("No app_vulnerabilities doc is found with appid - " + appid);
+  		}
+	        else
+		{
+			app_vul_doc.document.vulnerabilities.push(new_vuln);
+			update_document_in_db(app_vul_doc, function(result){
+				
+			});
+			console.log("app_vulnerabilities doc is found with appid - " + appid);
+		}
+	});
+	return callback();
+}
+
+function update_document_in_db(doc, callback)
+{
+	var request = require('request');
+
+	//console.log("Updating with doc : " + JSON.stringify(doc));
+	var options = {
+  		'method': 'POST',
+  		'url': 'https://data.mongodb-api.com/app/data-ilixv/endpoint/data/v1/action/replaceOne',
+  		'headers': {
+    			'Content-Type': 'application/json',
+    			'Access-Control-Request-Headers': '*',
+    			'api-key': '6354352e863169c99771a650'
+  		},
+  		body: JSON.stringify({
+    			"dataSource": "risqexpert-db",
+    			"database": "risqexpertdb",
+    			"collection": "app_vulnerabilities",
+    			"filter": { "metadata.component.name": doc.document.metadata.component.name },
+			"replacement": { "bomFormat" : doc.document.bomFormat, "specVersion": doc.document.specVersion,
+				         "serialNumber": doc.document.serialNumber,
+				         "version": doc.document.version,
+					 "metadata": doc.document.metadata, 
+				         "components":doc.document.components,
+					 "vulnerabilities" :doc.document.vulnerabilities
+					},
+			"upsert" : true
+  		})
+	};
+	request(options, function (error, response) 
+	{
+  		if (error) {
+			throw new Error(error);
+			return callback();
+		}
+		var result=JSON.parse(response.body);
+		//console.log(result);
+  		if( result.document === 'undefined' || result.document === null ){
+			console.log("Could not update document in Ddatabase");
+		}
+		else {
+			console.log("Updated document in Database " +result.modifiedCount);
+		}
+	});
+	return callback();
 }
 
 // Export process_cve function

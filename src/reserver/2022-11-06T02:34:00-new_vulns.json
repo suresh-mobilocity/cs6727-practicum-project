@@ -1,0 +1,140 @@
+{
+  "resultsPerPage": 2,
+  "startIndex": 0,
+  "totalResults": 2,
+  "format": "NVD_CVE",
+  "version": "2.0",
+  "timestamp": "2022-11-06T02:34:00.460",
+  "vulnerabilities": [
+    {
+      "cve": {
+        "id": "CVE-2022-3868",
+        "sourceIdentifier": "cna@vuldb.com",
+        "published": "2022-11-05T09:15:09.490",
+        "lastModified": "2022-11-05T09:15:09.490",
+        "vulnStatus": "Received",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "A vulnerability classified as critical has been found in SourceCodester Sanitization Management System. Affected is an unknown function of the file /php-sms/classes/Master.php?f=save_quote. The manipulation of the argument id leads to sql injection. It is possible to launch the attack remotely. The exploit has been disclosed to the public and may be used. The identifier of this vulnerability is VDB-213012."
+          }
+        ],
+        "metrics": {
+          "cvssMetricV31": [
+            {
+              "source": "cna@vuldb.com",
+              "type": "Secondary",
+              "cvssData": {
+                "version": "3.1",
+                "vectorString": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:L/I:L/A:L",
+                "attackVector": "NETWORK",
+                "attackComplexity": "LOW",
+                "privilegesRequired": "HIGH",
+                "userInteraction": "NONE",
+                "scope": "UNCHANGED",
+                "confidentialityImpact": "LOW",
+                "integrityImpact": "LOW",
+                "availabilityImpact": "LOW",
+                "baseScore": 4.7,
+                "baseSeverity": "MEDIUM"
+              },
+              "exploitabilityScore": 1.2,
+              "impactScore": 3.4
+            }
+          ]
+        },
+        "weaknesses": [
+          {
+            "source": "cna@vuldb.com",
+            "type": "Primary",
+            "description": [
+              {
+                "lang": "en",
+                "value": "CWE-707"
+              },
+              {
+                "lang": "en",
+                "value": "CWE-74"
+              },
+              {
+                "lang": "en",
+                "value": "CWE-89"
+              }
+            ]
+          }
+        ],
+        "references": [
+          {
+            "url": "https://github.com/x9AD8/Sanitization-Management-System/blob/main/README.md",
+            "source": "cna@vuldb.com"
+          },
+          {
+            "url": "https://vuldb.com/?id.213012",
+            "source": "cna@vuldb.com"
+          }
+        ]
+      }
+    },
+    {
+      "cve": {
+        "id": "CVE-2022-3869",
+        "sourceIdentifier": "security@huntr.dev",
+        "published": "2022-11-05T14:15:09.580",
+        "lastModified": "2022-11-05T14:15:09.580",
+        "vulnStatus": "Received",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "Code Injection in GitHub repository froxlor/froxlor prior to 0.10.38.2."
+          }
+        ],
+        "metrics": {
+          "cvssMetricV30": [
+            {
+              "source": "security@huntr.dev",
+              "type": "Secondary",
+              "cvssData": {
+                "version": "3.0",
+                "vectorString": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+                "attackVector": "NETWORK",
+                "attackComplexity": "LOW",
+                "privilegesRequired": "NONE",
+                "userInteraction": "NONE",
+                "scope": "UNCHANGED",
+                "confidentialityImpact": "LOW",
+                "integrityImpact": "LOW",
+                "availabilityImpact": "NONE",
+                "baseScore": 6.5,
+                "baseSeverity": "MEDIUM"
+              },
+              "exploitabilityScore": 3.9,
+              "impactScore": 2.5
+            }
+          ]
+        },
+        "weaknesses": [
+          {
+            "source": "security@huntr.dev",
+            "type": "Secondary",
+            "description": [
+              {
+                "lang": "en",
+                "value": "CWE-94"
+              }
+            ]
+          }
+        ],
+        "references": [
+          {
+            "url": "https://github.com/froxlor/froxlor/commit/3f10a4adede9df83408d60ded78b51b812a763a8",
+            "source": "security@huntr.dev"
+          },
+          {
+            "url": "https://huntr.dev/bounties/7de20f21-4a9b-445d-ae2b-15ade648900b",
+            "source": "security@huntr.dev"
+          }
+        ]
+      }
+    }
+  ]
+}

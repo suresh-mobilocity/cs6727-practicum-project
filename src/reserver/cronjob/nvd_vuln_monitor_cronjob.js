@@ -4,9 +4,9 @@ var fs = require('fs');
 var pcve = require ('./process_cves.js');
 
 
-console.log("Cron Job to check NVD for new Vulnerabilities every 5 minutes");
+console.log("Cron Job to check NVD for new Vulnerabilities every one hour");
 var checkNVDJob = new CronJob({
-        cronTime: '0 */1 * * * *',
+        cronTime: '0 * */1 * * *',
         onTick: function() {
             try{
                 startCheckNVDJob(function(result){
