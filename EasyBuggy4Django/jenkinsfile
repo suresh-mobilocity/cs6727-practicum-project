@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    environment{
+        gitCredentialId = '538642ab-cd02-4e8f-8025-ee284820b1cd'
+        APP_ID='EasyBuggy4Django'
+        VERSION='1.0.0'
+        BUILD_NUM='bld2022'
+        SBOM_FILE='EasyBuggy4Django-1.0.0-bld2022.sbom'
+        ARTIFACTS_DIR='/home/risqexpert/build-artifacts'
+        SBOM_DIR='/home/risqexpert/sbom-files'
+        VUL_FILE='EasyBuggy4Django-1.0.0-bld2022-vulns.json'
+    }
+    stages {
+        stage('CS6727-ProgressReport4') {
+            steps {
+                echo 'CS6727-ProgressReport4'
+                sh 'whoami'
+            }
+        }
+        stage('Clone sources') {
+            steps{
+                git (
+                    url: 'https://github.com/k-tamura/easybuggy4django.git',
+                    credentialsId: gitCredentialId
+                )
+            }
+        }
+        stage('build application') {
+             steps{
+                //sh 'pip install -r requirements.txt'
+                echo 'build complete'
+            }
+        }
+        stage('Publish Artifacts') {
+            steps {
+                    
+                    echo 'Publish artifacts complete'
+            }
+        }
+        stage('SBOM Creation') {
+            steps {
+                    sh '/usr/local/bin/syft packages dir:. -o spdx-json --file $SBOM_DIR/$SBOM_FILE'
+                    echo 'SBOM creation complete'
+                    sh '/usr/bin/node /home/risqexpert/scripts/update_sbom_appname.js $SBOM_DIR/$SBOM_FILE $APP_ID-$VERSION-$BUILD_NUM'
+                    echo 'Updated SBOM with APP_ID-VERSION-BUILDNUM'
+                    sh '/usr/bin/node /home/risqexpert/scripts/add_sbom_data.js $SBOM_DIR/$SBOM_FILE'
+                    echo 'Add SBOM to SBOM_INVENTORY done'
+            }
+        }
+        stage('Scan SBOM'){
+            steps {
+                    sh '/usr/local/bin/grype sbom:$SBOM_DIR/$SBOM_FILE -o embedded-cyclonedx-vex-json --file $SBOM_DIR/$VUL_FILE'
+                    echo 'Vulnerabily Scan Complete'
+                    sh '/usr/bin/node /home/risqexpert/scripts/update_vulns_metadata.js $SBOM_DIR/$VUL_FILE $APP_ID-$VERSION-$BUILD_NUM'
+                    sh '/usr/bin/node /home/risqexpert/scripts/add_vulns_data.js $SBOM_DIR/$VUL_FILE'
+                    echo 'Save Vulnerabilities List to DB'
+            }
+        }
+    }
+}
