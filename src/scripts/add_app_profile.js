@@ -1,5 +1,6 @@
 var request = require('request');
-fs = require('fs')
+fs = require('fs');
+const ParseServer = require('parse-server').ParseServer;
 
 var args = process.argv.slice(2);
 if(args.length<1){
